@@ -3,7 +3,7 @@ const { User, Thought } = require('../models');
 
 const thoughtController = {
     // Get all thoughts
-    async getThoughts (req, res) {
+    async getThoughts(req, res) {
         try {
             const thoughts = await Thought.find();
             res.status(200).json(thoughts);
@@ -14,12 +14,12 @@ const thoughtController = {
     },
 
     // Get a single thought
-    async getThought (req, res) {
+    async getThought(req, res) {
         try {
             const thought = await Thought.findOne({ _id: req.params.thoughtId });
 
             if (!thought) {
-                return res.status(404).json({ message: `No thought found with that Id.`});
+                return res.status(404).json({ message: `No thought found with that Id.` });
             }
 
             res.status(200).json(thought)
@@ -30,17 +30,17 @@ const thoughtController = {
     },
 
     // Create a thought
-    async createThought (req,res) {
+    async createThought(req, res) {
         try {
             const thought = await Thought.create(req.body);
 
             const user = await User.findByIdAndUpdate(
                 req.body.userId,
-                { $addToSet: { thoughts: thought._id }},
+                { $addToSet: { thoughts: thought._id } },
                 { runValidators: true, new: true }
             )
 
-            res.status(200).json({thought, user})
+            res.status(200).json({ thought, user })
         } catch (err) {
             console.log(err);
             res.status(500).json(err);
@@ -48,7 +48,7 @@ const thoughtController = {
     },
 
     // Update a thought
-    async updateThought (req,res) {
+    async updateThought(req, res) {
         try {
             const thought = await Thought.findOneAndUpdate(
                 { _id: req.params.thoughtId },
@@ -57,7 +57,7 @@ const thoughtController = {
             )
 
             if (!thought) {
-                return res.status(404).json({message: `No thought found with that Id.`})
+                return res.status(404).json({ message: `No thought found with that Id.` })
             }
 
             res.status(200).json(thought);
@@ -68,15 +68,15 @@ const thoughtController = {
     },
 
     // Delete a thought
-    async deleteThought (req,res) {
+    async deleteThought(req, res) {
         try {
             const thought = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
 
             if (!thought) {
-                return res.status(404).json({message: `No thought with that Id.`})
+                return res.status(404).json({ message: `No thought with that Id.` })
             }
 
-            res.status(200).json({ message: `Thought and associated reactions have been deleted.`})
+            res.status(200).json({ message: `Thought and associated reactions have been deleted.` })
         } catch (err) {
             console.log(err);
             res.status(500).json(err);
@@ -84,36 +84,36 @@ const thoughtController = {
     },
 
     // Add a reaction
-    async addReaction (req,res) {
+    async addReaction(req, res) {
         try {
             const reaction = await Thought.findOneAndUpdate(
                 { _id: req.params.thoughtId },
-                { $addToSet: { reactions: req.body }},
-                { runValidators: true, new: true }
-            )
+                { $addToSet: { reactions: req.body } },
+                { runValidators: true }
+            );
 
             if (!reaction) {
-                return res.status(404).json({message: `No thoguth with that Id found.`})
+                return res.status(404).json({ message: "No thought with that ID" });
             }
 
-            res.status(200).json(reaction);
+            return res.status(200).json(reaction);
         } catch (err) {
             console.log(err);
-            res.status(500).json(err);
+            return res.status(500).json(err);
         }
     },
 
     // Delete a reaction
-    async deleteReaction (req,res) {
+    async deleteReaction(req, res) {
         try {
             const reaction = await Thought.findOneAndUpdate(
                 { _id: req.params.thoughtId },
-                { $pull: { reactions: { _id: req.params.reactionId }}},
+                { $pull: { reactions: { _id: req.params.reactionId } } },
                 { runValidators: true, new: true }
             )
 
             if (!reaction) {
-                return res.status(404).json({message: `Check the Ids - invalid id entered.`});
+                return res.status(404).json({ message: `Check the Ids - invalid id entered.` });
             }
 
             res.status(200).json(reaction);
